@@ -8,23 +8,24 @@
 
 #import "SDFileDownloadView.h"
 #import "SDFileTableViewCell.h"
-#import "LMJRequestManager.h"
 #import "Masonry.h"
 #import "SDFileReadViewController.h"
-#import "LMJRequestManager.h"
 #import "MJDownload.h"
 
 //一个默认的坐标
 #define HHframe  CGRectMake(0, 0, 100, 30)
 #define SD_ScreenHeight [UIScreen mainScreen].bounds.size.height
 
+static NSString * CellID = @"SDFileTableViewCell";
 
-@interface SDFileDownloadView ()<UITableViewDelegate,UITableViewDataSource,promptCellDelegate>
+@interface SDFileDownloadView ()<UITableViewDelegate,UITableViewDataSource,PromptCellDelegate>
 
 @property (nonatomic,strong) UITableView * tableView;
 @property (nonatomic,strong) UIView * promptView;
 @property (nonatomic,assign) NSIndexPath *selectedIndexPath;
 @property (nonatomic,copy) NSString * cellStr;
+@property (strong, nonatomic) NSMutableArray *urls;
+
 
 @end
 
@@ -36,31 +37,30 @@
     if (self =[super initWithFrame:frame]) {
         
         self.cellArr = cellArr;
-        self.indexPath=indexPath;
-        self.cellStr=@"";
-        self.title=title;
+        self.indexPath = indexPath;
+        self.title = title;
         self.backgroundColor = [[UIColor blackColor ]colorWithAlphaComponent:0.4];
         
         UIView * promptView = [[UIView alloc]init];
         self.promptView = promptView;
         [self addSubview:promptView];
         
-        UILabel * titleLab= [[UILabel alloc]initWithFrame:HHframe];
+        UILabel * titleLab = [[UILabel alloc]initWithFrame:HHframe];
         titleLab.backgroundColor = [UIColor whiteColor];
-        titleLab.font =[UIFont systemFontOfSize:19];
-        titleLab.textAlignment=NSTextAlignmentCenter;
-        titleLab.text=title;
+        titleLab.font = [UIFont systemFontOfSize:19];
+        titleLab.textAlignment = NSTextAlignmentCenter;
+        titleLab.text = title;
         titleLab.textColor = [UIColor blackColor];
         
         UITableView * tableView = [[UITableView alloc]initWithFrame:HHframe style:UITableViewStylePlain];
-        tableView.delegate =self;
-        tableView.dataSource=self;
+        tableView.delegate = self;
+        tableView.dataSource = self;
         self.tableView = tableView;
         
         [promptView addSubview:titleLab];
         [promptView addSubview:tableView];
      
-        // layput 布局
+        // 布局
         [promptView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.bottom.left.right.mas_equalTo(self);
             make.height.mas_equalTo(SD_ScreenHeight*3/4);
@@ -79,30 +79,30 @@
             make.bottom.mas_equalTo(promptView.mas_bottom).offset(0);
         }];
 
-        [tableView registerNib:[UINib nibWithNibName:@"SDFileTableViewCell" bundle:nil] forCellReuseIdentifier:@"SDFileTableViewCell"];
-        tableView.tableFooterView= [[UIView alloc]initWithFrame:CGRectZero];
+        [tableView registerNib:[UINib nibWithNibName:CellID bundle:nil] forCellReuseIdentifier:CellID];
+        tableView.tableFooterView = [[UIView alloc]initWithFrame:CGRectZero];
     }
+    
     return self;
 }
 
 
 
 #pragma mark - UITableViewDataSource
-
 -(NSInteger )tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
 
-    return self.cellArr.count;
+//    return self.cellArr.count;
+    return self.urls.count;
 }
 
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
-    static NSString *ID = @"SDFileTableViewCell";
-    SDFileTableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:ID];
-    cell.selectionStyle=UITableViewCellSelectionStyleNone;
-    cell.delegate=self;
-    cell.titleLable.text=self.cellArr[indexPath.row];
+    SDFileTableViewCell * cell = [tableView dequeueReusableCellWithIdentifier:CellID];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.delegate = self;
+    cell.titleLable.text = self.cellArr[indexPath.row];
+    cell.url = self.urls[indexPath.row];
 
     return cell;
 }
@@ -113,47 +113,36 @@
 {
     SDFileTableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];
 
+    [self cellDidSelectRow:cell];
+    
+}
+
+
+
+#pragma mark - 点击cell didSelectRowAtIndexPath事件
+- (void) cellDidSelectRow :(SDFileTableViewCell *)cell {
+    
     // 1.0先隐藏掉下载按钮
     [cell.selectButton setHidden:YES];
     // 1.1显示下载进度label
     [cell.downloadSpeedLabel setHidden:NO];
     
     
-    // 2.1 下载文件url
-    NSArray<NSString *> *urls = @[
-                                  
-@"http://teaching.csse.uwa.edu.au/units/CITS4401/practicals/James1_files/SPMP1.pdf",
-@"http://down.51rc.com/dwndoc/WrittenExamination/WrittenExperiences/dwn00006795.doc",
-@"http://video1.remindchat.com/20190905/1gEji0Sv/mp4/1gEji0Sv.mp4",
-@"https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-@"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",
-@"http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4",
-                                  
-    ];
-    
     
     __weak typeof(self)weakSelf = self;
     
-    [urls enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    // 遍历URL个数创建对应的模型数组
+    [_urls enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         
+        // 获取下载文件对象
         MJDownloadInfo *info = [[MJDownloadManager defaultManager] downloadInfoForURL:obj];
         
-        if (info.state == MJDownloadStateCompleted) {
-            // 下载完成之后，下载中图标更换为下载完成图标
-            [cell.downloadSpeedLabel setHidden:YES];
-            [cell.selectButton setHidden:NO];
-            [cell.selectButton setImage:[UIImage imageNamed:@"downloadok"] forState:UIControlStateNormal];
-        }else {
-            // 未下载状态
-            NSLog(@"222222222222");
-        }
-        
-        
+        // 文件下载状态: 下载中和在下载队列排队, 最大3个下载
         if (info.state == MJDownloadStateResumed || info.state == MJDownloadStateWillResume) {
-            
+          
             
         } else if (info.state == MJDownloadStateSuspened || info.state == MJDownloadStateNone) {
-            
+            // 开始下载obj = Url
             [[MJDownloadManager defaultManager] download:obj progress:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -164,7 +153,7 @@
                 });
                 
             } state:^(MJDownloadState state, NSString *file, NSError *error) {
-                
+                // 主线程刷新UI
                 dispatch_async(dispatch_get_main_queue(), ^{
                     
                     // 2.3 下载完成，改变按钮状态，保存下载文件路径，保存cell点击状态
@@ -175,7 +164,6 @@
                         [cell.selectButton setImage:[UIImage imageNamed:@"downloadok"] forState:UIControlStateNormal];
                         
                         NSLog(@"打印保存文件路径地址 ：%@",file);
-                        
                     }
                 });
             }];
@@ -194,15 +182,6 @@
             }
         }
     }];
-    
-}
-
-
-
-#pragma mark - 点击cell didSelectRowAtIndexPath事件
-- (void) cellDidSelectRow :(SDFileTableViewCell *)cell {
-    
-  
 }
 
 
@@ -212,8 +191,29 @@
 -(void)selectRowStr:(NSString *)cellStr indexPath:(NSIndexPath *)selectedIndexPath
 {
 
+    
 }
+ 
 
+- (NSMutableArray *)urls
+{
+    if (!_urls) {
+        self.urls = [NSMutableArray array];
+        
+        [self.urls addObject:[NSString stringWithFormat:@"http://teaching.csse.uwa.edu.au/units/CITS4401/practicals/James1_files/SPMP1.pdf"]];
+        [self.urls addObject:[NSString stringWithFormat:@"http://down.51rc.com/dwndoc/WrittenExamination/WrittenExperiences/dwn00006795.doc"]];
+        
+        [self.urls addObject:[NSString stringWithFormat:@"https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4"]];
+        
+        [self.urls addObject:[NSString stringWithFormat:@"https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_50mb.mp4"]];
+        
+//        [self.urls addObject:[NSString stringWithFormat:@"http://video1.remindchat.com/20190905/1gEji0Sv/mp4/1gEji0Sv.mp4"]];
+      
+//        [self.urls addObject:[NSString stringWithFormat:@"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"]];
+//        [self.urls addObject:[NSString stringWithFormat:@"http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4"]];
+    }
+    return _urls;
+}
 
 
 

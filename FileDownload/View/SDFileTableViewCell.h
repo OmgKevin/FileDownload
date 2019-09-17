@@ -9,8 +9,10 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
 @class SDFileTableViewCell;
-@protocol promptCellDelegate <NSObject>
+
+@protocol PromptCellDelegate <NSObject>
 
 -(void)selectRowStr:(NSString *)cellStr indexPath:(NSIndexPath*)selectedIndexPath ;
 @end
@@ -21,12 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong) UIButton *lastButton;
 @property (nonatomic,assign) NSIndexPath *selectedIndexPath;
 
-@property (nonatomic,weak) id<promptCellDelegate>delegate;
+@property (nonatomic,copy) NSString *url;
+
+@property (nonatomic,weak) id<PromptCellDelegate>delegate;
 
 @property (nonatomic,weak) IBOutlet UILabel *titleLable;
-
 @property (nonatomic,weak) IBOutlet UIButton *selectButton;
- 
 @property (nonatomic,weak) IBOutlet UILabel *downloadSpeedLabel;
 
 

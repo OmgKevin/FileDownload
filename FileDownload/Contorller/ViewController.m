@@ -9,7 +9,6 @@
 #import "ViewController.h"
 #import "SDFileReadViewController.h"
 #import <QuickLook/QuickLook.h>
-#import "LMJRequestManager.h"
 #import "MJDownload.h"
 #import "SDFileReadViewController.h"
 #import "SDFileDownloadView.h"
