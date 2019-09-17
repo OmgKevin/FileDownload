@@ -42,15 +42,7 @@
     
     
     
-    UIButton *lookbutton = [[UIButton alloc] init];
-    [lookbutton setTitle:@"查看" forState:UIControlStateNormal];
-    [lookbutton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    lookbutton.backgroundColor = [UIColor lightGrayColor];
-    [lookbutton addTarget:self action:@selector(lookAction:) forControlEvents:UIControlEventTouchUpInside];
-    
-    
     [self.view addSubview:downloadbutton];
-    [self.view addSubview:lookbutton];
     
     
     
@@ -61,14 +53,6 @@
         make.center.equalTo(self.view).mas_offset(-100);
     }];
     
-    
-    
-    [lookbutton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(self.view);
-        make.right.equalTo(self.view);
-        make.height.equalTo(@40);
-        make.center.equalTo(self.view).mas_offset(100);
-    }];
     
 }
 

@@ -122,14 +122,14 @@
     // 2.1 下载文件url
     NSArray<NSString *> *urls = @[
                                   
-        @"http://teaching.csse.uwa.edu.au/units/CITS4401/practicals/James1_files/SPMP1.pdf",
-        @"http://down.51rc.com/dwndoc/WrittenExamination/WrittenExperiences/dwn00006795.doc",
-        @"http://video1.remindchat.com/20190905/1gEji0Sv/mp4/1gEji0Sv.mp4",
-        @"https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-        @"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",
-        @"http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4",
+@"http://teaching.csse.uwa.edu.au/units/CITS4401/practicals/James1_files/SPMP1.pdf",
+@"http://down.51rc.com/dwndoc/WrittenExamination/WrittenExperiences/dwn00006795.doc",
+@"http://video1.remindchat.com/20190905/1gEji0Sv/mp4/1gEji0Sv.mp4",
+@"https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+@"http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4",
+@"http://mirror.aarnet.edu.au/pub/TED-talks/911Mothers_2010W-480p.mp4",
                                   
-        ];
+    ];
     
     
     __weak typeof(self)weakSelf = self;
