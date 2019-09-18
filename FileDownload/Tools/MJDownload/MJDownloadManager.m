@@ -16,7 +16,7 @@ static NSMutableDictionary *_totalFileSizes;
 static NSString *_totalFileSizesFile;
 
 /** 根文件夹 */
-static NSString * const MJDownloadRootDir = @"SD_File_Download_Path";
+static NSString * const MJDownloadRootDir = @"SDDownloadFile_Path";
 
 /** 默认manager的标识 */
 static NSString * const MJDowndloadManagerDefaultIdentifier = @"com.github.njhu.www.downloadmanager";
@@ -60,7 +60,8 @@ static NSString * const MJDowndloadManagerDefaultIdentifier = @"com.github.njhu.
 - (NSString *)file
 {
     if (_file == nil) {
-        _file = [[NSString stringWithFormat:@"%@/%@", MJDownloadRootDir, self.filename] prependCaches];
+
+        _file = [[NSString stringWithFormat:@"%@/%@", MJDownloadRootDir, self.filename] prependDocuments];
     }
     
     if (_file && ![[NSFileManager defaultManager] fileExistsAtPath:_file]) {

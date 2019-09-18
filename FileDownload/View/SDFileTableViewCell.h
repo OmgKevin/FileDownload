@@ -20,7 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SDFileTableViewCell : UITableViewCell
 
-@property (nonatomic,strong) UIButton *lastButton;
 @property (nonatomic,assign) NSIndexPath *selectedIndexPath;
 
 @property (nonatomic,copy) NSString *url;

@@ -15,6 +15,11 @@
 - (NSString *)prependCaches;
 
 /**
+ *  Documents文件夹
+ */
+- (NSString *)prependDocuments;
+
+/**
  *  生成MD5摘要
  */
 - (NSString *)MD5;

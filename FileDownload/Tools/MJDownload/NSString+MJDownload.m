@@ -15,6 +15,12 @@
     return [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:self];
 }
 
+- (NSString *)prependDocuments{
+    
+    return [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject]
+            stringByAppendingPathComponent:self];
+}
+
 - (NSString *)MD5
 {
     // 得出bytes

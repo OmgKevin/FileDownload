@@ -41,33 +41,21 @@
         [self.selectButton setImage:[UIImage imageNamed:@"downloadok"] forState:UIControlStateNormal];
         
     } else if (info.state == MJDownloadStateWillResume) {// 即将下载（等待下载）
-     
         
     } else {
-        
         if (info.state == MJDownloadStateNone ) {// 闲置状态
             
-            
-        } else {
-            
-            if (info.totalBytesExpectedToWrite) {
-                
-            } else {
-                
-            }
         }
-        
+
         if (info.state == MJDownloadStateResumed) {// 下载中
             [self.selectButton setHidden:YES];
             [self.downloadSpeedLabel setHidden:NO];
-            NSLog(@"状态状态");
             
             [[MJDownloadManager defaultManager] download:url progress:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
-
-                    self.downloadSpeedLabel.text = [NSString stringWithFormat:@"%.2f%%", (CGFloat)totalBytesWritten / totalBytesExpectedToWrite * 100.0];
                     
+                    self.downloadSpeedLabel.text = [NSString stringWithFormat:@"%.2f%%", (CGFloat)totalBytesWritten / totalBytesExpectedToWrite * 100.0];
                 });
                 
             } state:^(MJDownloadState state, NSString *file, NSError *error) {
@@ -79,27 +67,52 @@
                         [self.downloadSpeedLabel setHidden:YES];
                         [self.selectButton setHidden:NO];
                         [self.selectButton setImage:[UIImage imageNamed:@"downloadok"] forState:UIControlStateNormal];
-                        
+                        NSLog(@"下载完成，打印文件所在路径 :%@",file);
                     }
                 });
             }];
-        } else {
-           
-        }
-    }
+        }}
 }
 
 
 - (IBAction)selectButtonAction:(UIButton *)sender {
     
-    if ([self.delegate respondsToSelector:@selector(selectRowStr:indexPath:)]) {
-      [_delegate selectRowStr:self.titleLable.text indexPath:self.selectedIndexPath];
+    // 1.0先隐藏掉下载按钮
+    [self.selectButton setHidden:YES];
+    // 1.1显示下载进度label
+    [self.downloadSpeedLabel setHidden:NO];
+    
+    // 获取下载文件对象
+    MJDownloadInfo *info = [[MJDownloadManager defaultManager] downloadInfoForURL:_url];
+    
+    
+    // 文件下载状态: 下载中和在下载队列排队, 最大3个下载
+    if (info.state == MJDownloadStateResumed || info.state == MJDownloadStateWillResume) {
+        [[MJDownloadManager defaultManager] suspend:info.url];
+        
+    } else if (info.state == MJDownloadStateSuspened || info.state == MJDownloadStateNone) {
+        // 开始下载obj = Url
+        [[MJDownloadManager defaultManager] download:_url progress:^(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite) {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.url = self.url;
+            });
+            
+        } state:^(MJDownloadState state, NSString *file, NSError *error) {
+            // 主线程刷新UI
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.url = self.url;
+                
+            });
+        }];
     }
 }
 
+
+
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-
+    
     
 }
 
