@@ -23,7 +23,7 @@ static NSString * CellID = @"SDFileTableViewCell";
 @property (nonatomic,strong) UIView * promptView;
 @property (nonatomic,assign) NSIndexPath *selectedIndexPath;
 @property (nonatomic,copy) NSString * cellStr;
-@property (strong, nonatomic) NSMutableArray *urls;
+@property (nonatomic, strong) NSMutableArray *urls;
 
 
 @end

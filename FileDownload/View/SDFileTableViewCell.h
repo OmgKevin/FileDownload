@@ -23,12 +23,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,assign) NSIndexPath *selectedIndexPath;
 
 @property (nonatomic,copy) NSString *url;
+@property (nonatomic,copy) NSString *filePath;
 
 @property (nonatomic,weak) id<PromptCellDelegate>delegate;
 
 @property (nonatomic,weak) IBOutlet UILabel *titleLable;
 @property (nonatomic,weak) IBOutlet UIButton *selectButton;
 @property (nonatomic,weak) IBOutlet UILabel *downloadSpeedLabel;
+
 
 
 @end
